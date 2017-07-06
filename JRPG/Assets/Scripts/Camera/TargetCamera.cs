@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TargetCamera : MonoBehaviour {
-    public enum CAMERA_METHOD {
+    private enum CAMERA_METHOD {
         FIXED,
         ROTATE,
     }
+
     [SerializeField] private GameObject target;
-    [SerializeField] private CAMERA_METHOD method = CAMERA_METHOD.FIXED;
-    [SerializeField] private float height_from_ground = 2f;
-    [SerializeField] private float XZ_diff_from_target = 5f;
-    [SerializeField] private float rotate_camera_angle = 45f;
-    [SerializeField] private float loaction_speed = 4f;
-    [SerializeField] private float rotate_speed = 4f;
+    [SerializeField] private CAMERA_METHOD method       = CAMERA_METHOD.FIXED;
+    [SerializeField] private float height_from_ground   = 2f;
+    [SerializeField] private float XZ_diff_from_target  = 5f;
+    [SerializeField] private float rotate_camera_angle  = 45f;
+    [SerializeField] private float loaction_speed       = 4f;
+    [SerializeField] private float rotate_speed         = 4f;
 
     void Update( ) {
         if ( !target ) {

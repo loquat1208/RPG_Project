@@ -4,13 +4,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SingleCharaterRPGSystem : MonoBehaviour {
-    public enum GAME_STATE {
+    private enum GAME_STATE {
         TRIP,   /*冒険状態*/
         TALK,   /*会話状態*/
         PHASE,  /*一時停止状態*/
     }
 
-    public enum HERO_MOVE_METHOD {
+    private enum HERO_MOVE_METHOD {
         MOVE_DIR_SHARE,     /*チャラが移動する方向を向かう*/
         MOVE_DIR_SEPARATE,  /*移動の操作と方向の操作が分かれている*/
     }
@@ -121,11 +121,19 @@ public class SingleCharaterRPGSystem : MonoBehaviour {
     }
 
     void InteractionToNPC( ) {
-        m_game_state = GAME_STATE.TALK;
         NPC npc = m_hero.MeetObject.transform.parent.GetComponent<NPC>( );
-        GameObject talk_box = npc.TalkBox;
-        if ( !talk_box ) return;
-        Instantiate( talk_box );
+        //キャラの状態を戻すことなので反対に見える
+        if ( !npc.IsTalking ) {
+            m_game_state = GAME_STATE.TALK;
+        } else {
+            m_game_state = GAME_STATE.TRIP;
+        }
+
+        if ( npc.TalkBox ) {
+            npc.NextPage( );
+        } else {
+            npc.StartTalking( );
+        }
     }
     /*Heroのアクション関連エンド*/
 }

@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour {
-    /*
-	 WASD_MOUSE : Change position with WASD, direction with Mouse;
-	 */
     public enum INPUT_METHOD {
-        KEY_MOUSE,
+        KEY_MOUSE, /*Change position with WASD, direction with Mouse;*/
     }
 
     [SerializeField] private INPUT_METHOD input_method = INPUT_METHOD.KEY_MOUSE;
