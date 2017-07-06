@@ -20,11 +20,14 @@ public class SingleCharaterRPGSystem : MonoBehaviour {
     [SerializeField] private float            hero_location_speed   = 4f;
     [SerializeField] private float            hero_rotate_speed     = 4f;
 
-    private InputManager m_input_manager;
-    private DataStorage  m_data_storage;
-    private GAME_STATE   m_game_state = GAME_STATE.TRIP;
+    private Hero                m_hero;
+    private InputManager        m_input_manager;
+    private CharacterController m_chara_controller;
+    private DataStorage         m_data_storage;
+    private GAME_STATE          m_game_state = GAME_STATE.TRIP;
 
     void Start( ) {
+        Screen.SetResolution( Screen.width, Screen.width * 9 / 16, true );
         //Dataの保存のために必要
         m_data_storage = FindObjectOfType<DataStorage>( );
         if ( !m_data_storage ) {
@@ -39,11 +42,13 @@ public class SingleCharaterRPGSystem : MonoBehaviour {
         }
 
         //HeroのComponent管理
-        if ( !hero.GetComponent<Hero>( ) ) {
-            hero.AddComponent<Hero>( );
-        }
-        if ( !hero.GetComponent<CharacterController>( ) ) {
+        m_chara_controller = hero.GetComponent<CharacterController>( );
+        if ( !m_chara_controller ) {
             hero.AddComponent<CharacterController>( );
+        }
+        m_hero = hero.GetComponent<Hero>( );
+        if ( !m_hero ) {
+            hero.AddComponent<Hero>( );
         }
     }
 
@@ -53,6 +58,7 @@ public class SingleCharaterRPGSystem : MonoBehaviour {
             return;
         }
         UpdateHeroMove( );
+        UpdateHeroAction( );
     }
 
     /*Heroの移動関連スタート*/
@@ -70,10 +76,8 @@ public class SingleCharaterRPGSystem : MonoBehaviour {
     }
 
     void MoveDirShareUpdate( ) {
-        CharacterController chara_controller = hero.GetComponent<CharacterController>( );
-
-        Vector3 hero_change_pos = ( m_input_manager.GetMoveInput * hero_location_speed ) + Physics.gravity;
-        chara_controller.Move( hero_change_pos * Time.deltaTime );
+        Vector3 hero_change_pos = ( m_input_manager.GetMoveInput * hero_location_speed ) + GravityRevision;
+        m_chara_controller.Move( hero_change_pos * Time.deltaTime );
 
         if ( m_input_manager.GetMoveInput != Vector3.zero ) {
             Quaternion target_dir = Quaternion.LookRotation( m_input_manager.GetMoveInput );
@@ -83,19 +87,45 @@ public class SingleCharaterRPGSystem : MonoBehaviour {
     }
 
     void MoveDirSeparateUpdate( ) {
-        CharacterController chara_controller = hero.GetComponent<CharacterController>( );
-
-        Vector3 hero_change_pos = ( hero.transform.forward * m_input_manager.GetMoveInput.z * hero_location_speed ) + Physics.gravity;
-        chara_controller.Move( hero_change_pos * Time.deltaTime );
+        Vector3 hero_change_pos = ( hero.transform.forward * m_input_manager.GetMoveInput.z * hero_location_speed ) + GravityRevision;
+        m_chara_controller.Move( hero_change_pos * Time.deltaTime );
 
         float rotate_speed = m_input_manager.GetMoveInput.x * hero_rotate_speed;
         hero.transform.Rotate( Vector3.up, rotate_speed );
     }
+
+    //CharacterControllerには重力がないので補正
+    private Vector3 m_speed_gravity_revision;
+    Vector3 GravityRevision {
+        get {
+            if ( !m_chara_controller.isGrounded ) {
+                m_speed_gravity_revision += Physics.gravity * Time.deltaTime;
+            } else {
+                m_speed_gravity_revision = Vector3.zero;
+            }
+            return m_speed_gravity_revision;
+        }
+    }
     /*Heroの移動関連エンド*/
 
     /*Heroのアクション関連スタート*/
-    void Action( ) {
+    void UpdateHeroAction( ) {
+        if ( !m_hero.MeetObject             ) return;
+        if ( !m_input_manager.GetFire1Input ) return;
+            
+        switch( m_hero.MeetObject.tag ) {
+            case "NPC":
+                InteractionToNPC( );
+                break;
+        }
+    }
 
+    void InteractionToNPC( ) {
+        m_game_state = GAME_STATE.TALK;
+        NPC npc = m_hero.MeetObject.transform.parent.GetComponent<NPC>( );
+        GameObject talk_box = npc.TalkBox;
+        if ( !talk_box ) return;
+        Instantiate( talk_box );
     }
     /*Heroのアクション関連エンド*/
 }

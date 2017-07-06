@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class NPC : MonoBehaviour {
-    [SerializeField] private float raider_radius = 3f;
+    [SerializeField] private GameObject talk_box;
+    [SerializeField] private bool       has_quest       = false;
+    [SerializeField] private float      raider_radius   = 3f;
 
-	void Start( ) {
+    public GameObject TalkBox   { get { return talk_box;    } }
+    public bool       HasQuest  { get { return has_quest;   } }
+
+    void Start( ) {
         init( );
     }
 
