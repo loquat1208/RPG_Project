@@ -96,7 +96,7 @@ public class SingleCharaterRPGSystem : MonoBehaviour {
 
     //CharacterControllerには重力がないので補正
     private Vector3 m_speed_gravity_revision;
-    Vector3 GravityRevision {
+	Vector3 GravityRevision {
         get {
             if ( !m_chara_controller.isGrounded ) {
                 m_speed_gravity_revision += Physics.gravity * Time.deltaTime;
@@ -104,7 +104,7 @@ public class SingleCharaterRPGSystem : MonoBehaviour {
                 m_speed_gravity_revision = Vector3.zero;
             }
             return m_speed_gravity_revision;
-        }
+		}
     }
     /*Heroの移動関連エンド*/
 
